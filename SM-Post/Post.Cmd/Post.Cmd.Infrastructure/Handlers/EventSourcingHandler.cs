@@ -25,7 +25,7 @@ namespace Post.Cmd.Infrastructure.Handlers
 
             if (events == null || !events.Any()) return aggregate;
 
-            aggregate.ReplyEvents(events);
+            aggregate.ReplayEvents(events);
             var latestVersion = events.Select(x => x.Version).Max();
             aggregate.Version = latestVersion;
 
@@ -34,7 +34,7 @@ namespace Post.Cmd.Infrastructure.Handlers
 
         public async Task SaveAsync(AggregateRoot aggregate)
         {
-            await _eventStore.SaveEventAsync(aggregate.Id, aggregate.GetUncommitedChanges, aggregate.Version);
+            await _eventStore.SaveEventAsync(aggregate.Id, aggregate.GetUncommitedChanges(), aggregate.Version);
             aggregate.MarkChangesAsCommitted();
         }
     }

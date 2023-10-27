@@ -14,7 +14,7 @@ namespace Post.Cmd.Infrastructure.Repositories
     public class EventStoreRepository : IEventStoreRepository
     {
         private readonly IMongoCollection<EventModel> _eventStoreCollection;
-        public EventStoreRepository(IOptions<MongDbConfig> config)
+        public EventStoreRepository(IOptions<MongoDbConfig> config)
         {
             var mongoClient = new MongoClient(config.Value
                 .ConnectionString);

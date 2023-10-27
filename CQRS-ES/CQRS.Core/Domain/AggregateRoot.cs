@@ -16,7 +16,10 @@ namespace CQRS.Core.Domain
 
         public int Version { get; set; } = -1;
 
-        public IEnumerable<BaseEvent> GetUncommitedChanges { get {  return _changes; } }
+        public IEnumerable<BaseEvent> GetUncommitedChanges() 
+        {
+            return _changes; 
+        }
 
         public void MarkChangesAsCommitted()
         {
@@ -26,9 +29,9 @@ namespace CQRS.Core.Domain
         private void ApplyChanges(BaseEvent @event, bool isnew)
         {
             var method = this.GetType().GetMethod("Apply", new Type[] { @event.GetType() });
-            if (method != null)
+            if (method == null)
             {
-                throw new ArgumentNullException(nameof(method), $"The apply method wasn't found it the aggregatefor {@event.GetType().Name}");
+                throw new ArgumentNullException(nameof(method), $"The apply method wasn't found it the aggregate for {@event.GetType().Name}");
             }
             method.Invoke(this, new object[] { @event });
 
@@ -43,7 +46,7 @@ namespace CQRS.Core.Domain
             ApplyChanges(@event, true);
         }
 
-        public void ReplyEvents(IEnumerable<BaseEvent> events)
+        public void ReplayEvents(IEnumerable<BaseEvent> events)
         {
             foreach (var @event in events)
             {
