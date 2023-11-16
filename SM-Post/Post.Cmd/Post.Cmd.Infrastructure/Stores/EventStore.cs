@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Post.Cmd.Domain.Aggregates;
 using CQRS.Core.Producers;
+using System.Diagnostics.Tracing;
 
 namespace Post.Cmd.Infrastructure.Stores
 {
@@ -21,6 +22,17 @@ namespace Post.Cmd.Infrastructure.Stores
             _eventStoreRepository = eventStoreRepository;
             _eventProducer = eventProducer;
         }
+
+        public async Task<List<Guid>> GetAggregateIdsAsync()
+        {
+            var eventStream = await _eventStoreRepository.FindAllAsync();
+
+            if (eventStream == null || eventStream.Any()) { throw new ArgumentNullException(nameof(eventStream), "Not foun event stream"); }
+
+            return eventStream.Select(x => x.AggregateIdentifier).Distinct().ToList();
+
+        }
+
         public async Task<List<BaseEvent>> GetEventAsync(Guid aggreagateId)
         {
             var eventStream = await _eventStoreRepository.FindByAggregateId(aggreagateId);
